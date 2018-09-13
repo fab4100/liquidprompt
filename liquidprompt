@@ -881,6 +881,21 @@ _lp_git_head_status() {
 # - red if there is changes to commit
 #
 # Add the number of pending commits and the impacted lines.
+_lp_mygit_branch_color()
+{
+    (( LP_ENABLE_GIT )) || return
+
+    local branch
+    branch="$(_lp_git_branch)"
+    if [[ -n "$branch" ]]; then
+        local end
+        local ret
+        end="${LP_COLOR_CHANGES}$(_lp_git_head_status)${NO_COL}"
+        ret="${LP_COLOR_MYDEFAULT}${branch}"
+        echo -nE "$ret$end"
+    fi
+}
+
 _lp_git_branch_color()
 {
     (( LP_ENABLE_GIT )) || return
@@ -1773,7 +1788,7 @@ _lp_set_prompt()
         _lp_shorten_path   # set LP_PWD
 
         if _lp_are_vcs_enabled; then
-            LP_VCS="$(_lp_git_branch_color)"
+            LP_VCS="$(_lp_mygit_branch_color)"
             LP_VCS_TYPE="git"
             if [[ -n "$LP_VCS" ]]; then
                 # If this is a vcsh repository
@@ -1825,7 +1840,7 @@ _lp_set_prompt()
     elif [[ -n "$LP_VCS_TYPE" ]]; then # we are still in a VCS dir
         case "$LP_VCS_TYPE" in
             # git, git-svn
-            git*)    LP_VCS="$(_lp_sl "$(_lp_git_branch_color)")";;
+            git*)    LP_VCS="$(_lp_sl "$(_lp_mygit_branch_color)")";;
             hg)      LP_VCS="$(_lp_sl "$(_lp_hg_branch_color)")";;
             svn)     LP_VCS="$(_lp_sl "$(_lp_svn_branch_color)")";;
             fossil)  LP_VCS="$(_lp_sl "$(_lp_fossil_branch_color)")";;
